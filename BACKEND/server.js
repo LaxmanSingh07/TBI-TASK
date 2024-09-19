@@ -8,7 +8,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -17,15 +16,14 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((error) => console.error("MongoDB connection error:", error));
 
-// Define Item Schema and Model
 const itemSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  description: { type: String, required: true }, // Changed to 'description' to match the frontend
+  quantity: { type: Number, required: true, default: 1 },
   packed: { type: Boolean, default: false },
 });
 
 const Item = mongoose.model("Item", itemSchema);
 
-// Get all items
 app.get("/api/items", async (req, res) => {
   try {
     const items = await Item.find();
@@ -37,20 +35,18 @@ app.get("/api/items", async (req, res) => {
 });
 
 app.post("/api/items", async (req, res) => {
-  const { name, packed } = req.body;
+  const { description, quantity, packed } = req.body;
 
-  if (!name || packed === undefined) {
+  if (!description || quantity === undefined || packed === undefined) {
     return res
       .status(400)
-      .json({ error: "Name and packed status are required" });
+      .json({ error: "Description, quantity, and packed status are required" });
   }
 
-  const newItem = new Item({ name, packed });
-  console.log("Received data:", req.body);
+  const newItem = new Item({ description, quantity, packed });
 
   try {
     await newItem.save();
-    console.log("New item saved:", newItem);
     res.json(newItem);
   } catch (error) {
     console.error("Error saving item:", error);
@@ -58,7 +54,6 @@ app.post("/api/items", async (req, res) => {
   }
 });
 
-// Delete an item by ID
 app.delete("/api/items/:id", async (req, res) => {
   try {
     await Item.findByIdAndDelete(req.params.id);
@@ -69,12 +64,15 @@ app.delete("/api/items/:id", async (req, res) => {
   }
 });
 
-// Update an item's packed status by ID
 app.put("/api/items/:id", async (req, res) => {
+  const { description, quantity, packed } = req.body;
+
   try {
-    const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const updatedItem = await Item.findByIdAndUpdate(
+      req.params.id,
+      { description, quantity, packed },
+      { new: true }
+    );
     res.json(updatedItem);
   } catch (error) {
     console.error("Error updating item:", error);
@@ -82,6 +80,15 @@ app.put("/api/items/:id", async (req, res) => {
   }
 });
 
-// Start the server
+app.delete("/api/items", async (req, res) => {
+  try {
+    await Item.deleteMany();
+    res.json({ message: "All items cleared" });
+  } catch (error) {
+    console.error("Error clearing items:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -6,22 +6,22 @@ function Form({ onAddItem }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    // guard clause
     if (!description.trim()) return;
-    const newtItem = {
+
+    const newItem = {
       description,
       quantity,
       packed: false,
-      id: Date.now(),
     };
-    onAddItem(newtItem);
 
+    onAddItem(newItem);
     setDescription("");
     setQuantity(1);
   }
+
   return (
     <form className="add-form" onSubmit={handleSubmit}>
-      <h3>What do you need for your 😍 trip</h3>
+      <h3>What do you need for your trip?</h3>
       <select
         value={quantity}
         onChange={(e) => setQuantity(Number(e.target.value))}

@@ -18,7 +18,7 @@ function PackingList({ items, onDeleteItem, onToggleItem, onClearList }) {
       <ul>
         {sortedItems.map((item) => (
           <Item
-            key={item.id}
+            key={item._id}
             {...item}
             onDeleteItem={onDeleteItem}
             onToggleItem={onToggleItem}

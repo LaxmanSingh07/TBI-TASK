@@ -1,5 +1,5 @@
 function Item({
-  id,
+  _id,
   description,
   quantity,
   packed,
@@ -11,12 +11,12 @@ function Item({
       <input
         type="checkbox"
         checked={packed}
-        onChange={() => onToggleItem(id)}
+        onChange={() => onToggleItem(_id)}
       />
       <span style={packed ? { textDecoration: "line-through" } : {}}>
         {quantity} {description}
       </span>
-      <button onClick={() => onDeleteItem(id)}>❌</button>
+      <button onClick={() => onDeleteItem(_id)}>❌</button>
     </li>
   );
 }
